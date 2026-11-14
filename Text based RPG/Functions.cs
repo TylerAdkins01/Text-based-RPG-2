@@ -1,5 +1,15 @@
 public static class Functions
 {
+    private static async Task PauseForDialogueAsync(int milliseconds = 800)
+    {
+        await Task.Delay(milliseconds);
+    }
+
+    private static void PauseForDialogue(int milliseconds = 800)
+    {
+        Thread.Sleep(milliseconds);
+    }
+
     // Deduct gold only when the character can afford the purchase.
     private static bool TrySpendGold(IGold character, int amount)
     {
@@ -35,7 +45,7 @@ public static class Functions
         """);
         Console.WriteLine("The Shopkeep: \"How may I help you today?\"");
 
-        await Task.Delay(1000);
+        await PauseForDialogueAsync();
 
         // Character.leave is shared with the encounter loops, so reset it for this menu.
         Character.leave = true;
@@ -98,19 +108,19 @@ public static class Functions
                 case "3":
                     // The shopkeeper retaliates; defeat ends the shop loop.
                     Console.WriteLine("Narrator: \"You attack the Shopkeep!\"");
-                    await Task.Delay(1000);
+                    await PauseForDialogueAsync();
                     Console.WriteLine("The Shopkeep: \"How dare you attack me!\"");
-                    await Task.Delay(1000);
+                    await PauseForDialogueAsync();
                     Console.WriteLine("The Shopkeep attacks you back!");
                     player.Health -= 5;
-                    await Task.Delay(1000);
+                    await PauseForDialogueAsync();
                     Console.WriteLine($"Narrator: \"You have {player.Health} health remaining.\"");
                     if (player.Health <= 0)
                     {
                         Console.WriteLine("Narrator: \"You have been defeated by the Shopkeep.\"");
                         Character.leave = false;
                     }
-                    await Task.Delay(1000);
+                    await PauseForDialogueAsync();
                     Console.Clear();
                     break;
 
@@ -118,12 +128,13 @@ public static class Functions
                     Console.WriteLine("Narrator: \"You sneakily take an item off the shelf!\"");
                     player.Gold += 1;
                     Console.WriteLine("Narrator: \"You gained 1 gold!\"");
-                    await Task.Delay(1000);
+                    await PauseForDialogueAsync();
                     Console.Clear();
                     break;
 
                 case "5":
                     Console.WriteLine("Narrator: \"You leave the shop.\"");
+                    PauseForDialogue();
                     Character.leave = false;
                     Console.Clear();
                     break;
@@ -150,8 +161,9 @@ public static class Functions
         (___|___)
         Hola mi amigo, mi nombre es Xicohtencatle
         """);
-        await Task.Delay(1000);
+        await PauseForDialogueAsync();
         Console.WriteLine("It seems an enemy has arrived.");
+        await PauseForDialogueAsync();
 
         Enemy creature = new Enemy(10, 6, 2);
         creature.Gold = 2;
@@ -188,6 +200,7 @@ public static class Functions
                     // A normal strike always deals at least one damage; the enemy retaliates if it survives.
                     int attackDamage = Math.Max(1, Player.Strength + 3);
                     Console.WriteLine(creature.TakeDamage(attackDamage, player));
+                    await PauseForDialogueAsync();
                     if (creature.Health <= 0)
                     {
                         Console.WriteLine("The creature falls, and you claim its supplies.");
@@ -205,14 +218,17 @@ public static class Functions
                             Console.WriteLine("What a depressing end to your adventure...");
                         }
                     }
+                    await PauseForDialogueAsync();
                     break;
 
                 case "2":
                     Console.WriteLine("¿Que? Yo no se.");
+                    await PauseForDialogueAsync();
                     break;
 
                 case "3":
                     Console.WriteLine("You attempt to escape from the creature's explosive weapons.");
+                    await PauseForDialogueAsync();
                     // Escaping costs part of the player's current health and ends the encounter.
                     player.Health = player.Health / 2 - 1;
                     Character.leave = false;
@@ -238,6 +254,7 @@ public static class Functions
                         Console.ResetColor();
                         Console.WriteLine("The creature blows up in a fiery explosion.");
                         Console.WriteLine(creature.TakeDamage(creature.Health, player));
+                        await PauseForDialogueAsync();
                         Console.WriteLine("Congratulations! You have incinerated your first enemy.");
                         player.hasFireball = false;
                         player.hasBomb = true;
@@ -265,6 +282,7 @@ public static class Functions
                         Console.WriteLine("A wave of frost crashes over the creature, freezing it in place.");
                         int frostDamage = Math.Max(1, Math.Max(1, Player.Strength + 3) / 2);
                         Console.WriteLine(creature.TakeDamage(frostDamage, player));
+                        await PauseForDialogueAsync();
                         player.hasFrost = false;
 
                         if (creature.Health <= 0)
@@ -326,6 +344,7 @@ public static class Functions
                   `'(_ )_)(_)_)'
             ------------------------------------------------
             """);
+                        PauseForDialogue();
                         player.Health += 5;
                         Player.Strength++;
                         Character.leave = false;
@@ -333,6 +352,7 @@ public static class Functions
 
                     case "2":
                         Console.WriteLine("You decide to explore the forest.");
+                        PauseForDialogue();
                         Console.WriteLine("""
                                                                     ,
                                                 .__ ._       \_.
@@ -377,6 +397,7 @@ public static class Functions
                                                    .,L+.,  
     """);
                         Console.WriteLine("It seems that an inconvenient branch lies in your path.");
+                        PauseForDialogue();
                         Character.leave = true;
 
                         while (Character.leave && player.Health > 0)
@@ -396,11 +417,13 @@ public static class Functions
                             {
                                 case "1":
                                     Console.WriteLine("You decide to move the branch.");
+                                    PauseForDialogue();
                                     Console.WriteLine("The branch is far too heavy to move.");
                                     break;
 
                                 case "2":
                                     Console.WriteLine("You choose to go around the branch.");
+                                    PauseForDialogue();
                                     if (Random.Shared.Next(1, 3) == 1)
                                     {
                                         Console.WriteLine("You successfully go around the branch.");
@@ -410,6 +433,7 @@ public static class Functions
                                     else
                                     {
                                         Console.WriteLine("Your foot falls through the leaves, and a pit opens beneath you.");
+                                        PauseForDialogue();
                                         Console.WriteLine("The fall is fatal, and your adventure comes to a depressing end.");
                                         player.Health = 0;
                                         Character.leave = false;
@@ -418,6 +442,7 @@ public static class Functions
 
                                 case "3":
                                     Console.WriteLine("You try to destroy the branch.");
+                                    PauseForDialogue();
                                     if (Player.Strength > 5)
                                     {
                                         Console.WriteLine("You successfully destroy the branch.");
@@ -435,6 +460,7 @@ public static class Functions
                                     {
                                         // The bomb clears the obstacle but also kills the player.
                                         Console.WriteLine("You use the bomb to destroy the branch.");
+                                        PauseForDialogue();
                                         Console.ForegroundColor = ConsoleColor.DarkRed;
                                         Console.WriteLine("""
                                    ________________
@@ -463,6 +489,7 @@ public static class Functions
 
                     """);
                                         Console.ResetColor();
+                                        PauseForDialogue();
                                         Console.WriteLine("The bomb is far more powerful than expected.");
                                         Console.WriteLine("You, as well as the branch, have blown up.");
                                         player.hasBomb = false;
@@ -498,13 +525,16 @@ public static class Functions
 
         Console.WriteLine("ᘛ⁐̤ᕐᐷ");
         Console.WriteLine("As you leave, the creature you fought returns as a powerful boss!");
+        PauseForDialogue();
         Console.WriteLine($"Boss Health: {boss.Health}");
         Console.WriteLine($"Boss Power Range: {boss.powerMin} - {boss.powerMax} (+{boss.Bonus} damage)");
+        PauseForDialogue();
 
         // Spells skip the boss's counterattack; normal strikes allow one.
         void AttackBoss(int damage, bool allowCounterattack)
         {
             Console.WriteLine(boss.TakeDamage(damage, player));
+            PauseForDialogue();
             if (boss.Health <= 0)
             {
                 Console.WriteLine("The boss is defeated!");
@@ -517,6 +547,7 @@ public static class Functions
                 int bossDamage = boss.DealDamage();
                 player.Health -= bossDamage;
                 Console.WriteLine($"The boss hits you for {bossDamage} damage. Health: {player.Health}");
+                PauseForDialogue();
             }
         }
 
@@ -553,10 +584,12 @@ public static class Functions
 
                 case "2":
                     Console.WriteLine("The boss refuses to negotiate.");
+                    PauseForDialogue();
                     break;
 
                 case "3":
                     Console.WriteLine("You attempt to escape from the boss.");
+                    PauseForDialogue();
                     int escapeDamage = player.Health - Math.Max(0, player.Health / 2 - 1);
                     player.Health -= escapeDamage;
                     Console.WriteLine($"You take {escapeDamage} damage while escaping. Health: {player.Health}");
@@ -567,6 +600,7 @@ public static class Functions
                     if (player.hasFireball)
                     {
                         Console.WriteLine("You unleash a fireball at the boss!");
+                        PauseForDialogue();
                         player.hasFireball = false;
                         AttackBoss(boss.Health, false);
                     }
@@ -580,6 +614,7 @@ public static class Functions
                     if (player.hasFrost)
                     {
                         Console.WriteLine("A wave of frost crashes over the boss, freezing it in place.");
+                        PauseForDialogue();
                         int frostDamage = Math.Max(1, Math.Max(1, Player.Strength + 3) / 2);
                         AttackBoss(frostDamage, false);
                         player.hasFrost = false;
